@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TIR PRO — Zostań Kierowcą Ciężarówki</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:ital,wght@0,400;0,600;0,700;1,400&family=Barlow+Condensed:wght@700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --yellow: #F5C400;
+    --yellow-dim: #c9a000;
+    --black: #0A0A0A;
+    --dark: #111111;
+    --dark2: #1A1A1A;
+    --dark3: #222222;
+    --white: #F2F0E8;
+    --gray: #888;
+    --road: #1C1C1C;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'Barlow', sans-serif;
+    overflow-x: hidden;
+  }
+
+  /* NOISE OVERLAY */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.4;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 40px;
+    background: rgba(10,10,10,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(245,196,0,0.15);
+  }
+
+  .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 3px;
+    color: var(--yellow);
+  }
+
+  .logo span { color: var(--white); }
+
+  nav ul {
+    display: flex;
+    gap: 36px;
+    list-style: none;
+  }
+
+  nav ul a {
+    color: var(--gray);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+
+  nav ul a:hover { color: var(--yellow); }
+
+  .nav-cta {
+    background: var(--yellow);
+    color: var(--black) !important;
+    padding: 10px 24px;
+    font-weight: 700 !important;
+    letter-spacing: 1.5px !important;
+  }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 0 40px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-road {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(180deg, rgba(10,10,10,0) 0%, rgba(10,10,10,0.7) 60%, var(--black) 100%),
+      linear-gradient(90deg, rgba(10,10,10,0.9) 0%, rgba(10,10,10,0.3) 60%);
+    z-index: 1;
+  }
+
+  /* Animated road lines */
+  .road-bg {
+    position: absolute;
+    inset: 0;
+    background: 
+      radial-gradient(ellipse 80% 50% at 70% 60%, rgba(30,25,5,0.8) 0%, transparent 70%),
+      linear-gradient(180deg, #0A0A0A 0%, #141208 40%, #1a1500 70%, #0d0c00 100%);
+    z-index: 0;
+  }
+
+  .road-lines {
+    position: absolute;
+    bottom: 0; left: 50%; right: 0;
+    height: 100%;
+    z-index: 0;
+    overflow: hidden;
+  }
+
+  .road-lines::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: -100%;
+    width: 6px;
+    height: 200%;
+    background: repeating-linear-gradient(
+      180deg,
+      var(--yellow) 0px,
+      var(--yellow) 60px,
+      transparent 60px,
+      transparent 120px
+    );
+    transform: perspective(400px) rotateX(30deg);
+    animation: roadMove 1.5s linear infinite;
+    opacity: 0.3;
+  }
+
+  @keyframes roadMove {
+    from { top: -100%; }
+    to { top: 0%; }
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 800px;
+    animation: fadeUp 1s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(40px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero-badge {
+    display: inline-block;
+    background: var(--yellow);
+    color: var(--black);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 6px 16px;
+    margin-bottom: 28px;
+  }
+
+  .hero h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(64px, 10vw, 130px);
+    line-height: 0.9;
+    letter-spacing: 2px;
+    margin-bottom: 30px;
+  }
+
+  .hero h1 .accent { color: var(--yellow); }
+
+  .hero-sub {
+    font-size: 18px;
+    color: rgba(242,240,232,0.7);
+    max-width: 560px;
+    line-height: 1.6;
+    margin-bottom: 48px;
+  }
+
+  .hero-buttons {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .btn-primary {
+    background: var(--yellow);
+    color: var(--black);
+    padding: 18px 40px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 18px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-block;
+  }
+
+  .btn-primary:hover {
+    background: var(--white);
+    transform: translateY(-2px);
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--white);
+    padding: 18px 40px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-decoration: none;
+    border: 1px solid rgba(242,240,232,0.3);
+    transition: all 0.2s;
+    display: inline-block;
+  }
+
+  .btn-secondary:hover {
+    border-color: var(--yellow);
+    color: var(--yellow);
+  }
+
+  /* STATS BAR */
+  .stats-bar {
+    background: var(--yellow);
+    padding: 24px 40px;
+    display: flex;
+    justify-content: center;
+    gap: 80px;
+    flex-wrap: wrap;
+  }
+
+  .stat {
+    text-align: center;
+  }
+
+  .stat-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 42px;
+    color: var(--black);
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(0,0,0,0.6);
+  }
+
+  /* SECTIONS */
+  section {
+    padding: 100px 40px;
+  }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--yellow);
+    margin-bottom: 16px;
+  }
+
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(42px, 6vw, 80px);
+    line-height: 1;
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+  }
+
+  .section-desc {
+    font-size: 17px;
+    color: rgba(242,240,232,0.6);
+    max-width: 560px;
+    line-height: 1.7;
+    margin-bottom: 60px;
+  }
+
+  /* ABOUT */
+  .about {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .about-visual {
+    position: relative;
+  }
+
+  .about-card {
+    background: var(--dark2);
+    border: 1px solid rgba(245,196,0,0.15);
+    padding: 48px;
+    position: relative;
+  }
+
+  .about-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--yellow);
+  }
+
+  .about-icon {
+    font-size: 56px;
+    margin-bottom: 24px;
+  }
+
+  .about-card h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    letter-spacing: 1px;
+    margin-bottom: 16px;
+    color: var(--yellow);
+  }
+
+  .about-card p {
+    color: rgba(242,240,232,0.7);
+    line-height: 1.7;
+  }
+
+  .check-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 32px;
+  }
+
+  .check-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    font-size: 16px;
+    color: rgba(242,240,232,0.8);
+    line-height: 1.5;
+  }
+
+  .check-list li::before {
+    content: '▶';
+    color: var(--yellow);
+    font-size: 10px;
+    margin-top: 5px;
+    flex-shrink: 0;
+  }
+
+  /* COURSES */
+  .courses-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  @media (max-width: 900px) {
+    .courses-grid { grid-template-columns: 1fr; }
+  }
+
+  .course-card {
+    background: var(--dark2);
+    padding: 48px 40px;
+    border-top: 3px solid transparent;
+    transition: all 0.3s;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .course-card:hover {
+    border-top-color: var(--yellow);
+    background: var(--dark3);
+  }
+
+  .course-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 1px;
+    background: rgba(245,196,0,0.1);
+  }
+
+  .course-tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border: 1px solid rgba(245,196,0,0.4);
+    color: var(--yellow);
+    margin-bottom: 24px;
+  }
+
+  .course-tag.hot {
+    background: var(--yellow);
+    color: var(--black);
+    border-color: var(--yellow);
+  }
+
+  .course-card h3 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 28px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    margin-bottom: 16px;
+    line-height: 1.2;
+  }
+
+  .course-card p {
+    font-size: 15px;
+    color: rgba(242,240,232,0.6);
+    line-height: 1.6;
+    margin-bottom: 32px;
+  }
+
+  .course-price {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 48px;
+    color: var(--yellow);
+    letter-spacing: 1px;
+    line-height: 1;
+  }
+
+  .course-price span {
+    font-family: 'Barlow', sans-serif;
+    font-size: 14px;
+    color: var(--gray);
+    font-weight: 400;
+    display: block;
+    margin-top: 4px;
+  }
+
+  .course-buy {
+    display: block;
+    margin-top: 28px;
+    background: transparent;
+    color: var(--yellow);
+    border: 1px solid var(--yellow);
+    padding: 14px 28px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-align: center;
+    text-decoration: none;
+    transition: all 0.2s;
+    cursor: pointer;
+  }
+
+  .course-card:hover .course-buy,
+  .course-buy:hover {
+    background: var(--yellow);
+    color: var(--black);
+  }
+
+  /* EBOOK */
+  .ebook-section {
+    background: var(--dark2);
+    border-top: 1px solid rgba(245,196,0,0.1);
+    border-bottom: 1px solid rgba(245,196,0,0.1);
+  }
+
+  .ebook-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+
+  .ebook-mockup {
+    background: linear-gradient(135deg, #1a1500 0%, #2a2000 50%, #1a1500 100%);
+    border: 1px solid rgba(245,196,0,0.3);
+    padding: 60px 50px;
+    text-align: center;
+    position: relative;
+  }
+
+  .ebook-mockup::before {
+    content: 'E-BOOK';
+    position: absolute;
+    top: 20px; right: 20px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: var(--yellow);
+    opacity: 0.5;
+  }
+
+  .ebook-mockup-icon {
+    font-size: 80px;
+    margin-bottom: 24px;
+  }
+
+  .ebook-mockup-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    letter-spacing: 2px;
+    color: var(--yellow);
+    line-height: 1.1;
+    margin-bottom: 12px;
+  }
+
+  .ebook-mockup-sub {
+    font-size: 14px;
+    color: var(--gray);
+  }
+
+  .ebook-features {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    margin-top: 40px;
+  }
+
+  .ebook-feature {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+  }
+
+  .feature-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    color: var(--yellow);
+    opacity: 0.4;
+    line-height: 1;
+    flex-shrink: 0;
+    width: 40px;
+  }
+
+  .feature-text h4 {
+    font-weight: 700;
+    font-size: 16px;
+    margin-bottom: 4px;
+  }
+
+  .feature-text p {
+    font-size: 14px;
+    color: rgba(242,240,232,0.5);
+    line-height: 1.5;
+  }
+
+  /* TESTIMONIALS */
+  .testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .testimonial {
+    background: var(--dark2);
+    padding: 40px;
+    border-top: 2px solid transparent;
+    transition: border-color 0.3s;
+  }
+
+  .testimonial:hover { border-top-color: var(--yellow); }
+
+  .stars {
+    color: var(--yellow);
+    font-size: 18px;
+    margin-bottom: 20px;
+    letter-spacing: 2px;
+  }
+
+  .testimonial blockquote {
+    font-size: 16px;
+    color: rgba(242,240,232,0.75);
+    line-height: 1.7;
+    font-style: italic;
+    margin-bottom: 28px;
+  }
+
+  .testimonial-author {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .author-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--yellow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    color: var(--black);
+    flex-shrink: 0;
+  }
+
+  .author-name {
+    font-weight: 700;
+    font-size: 15px;
+  }
+
+  .author-role {
+    font-size: 13px;
+    color: var(--gray);
+  }
+
+  /* CTA */
+  .cta-section {
+    background: var(--yellow);
+    text-align: center;
+    padding: 100px 40px;
+  }
+
+  .cta-section .section-label {
+    color: rgba(0,0,0,0.5);
+  }
+
+  .cta-section .section-title {
+    color: var(--black);
+  }
+
+  .cta-section p {
+    font-size: 18px;
+    color: rgba(0,0,0,0.6);
+    max-width: 500px;
+    margin: 0 auto 48px;
+    line-height: 1.6;
+  }
+
+  .btn-dark {
+    background: var(--black);
+    color: var(--yellow);
+    padding: 20px 56px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 20px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    display: inline-block;
+    transition: all 0.2s;
+  }
+
+  .btn-dark:hover { transform: translateY(-3px); }
+
+  /* FOOTER */
+  footer {
+    background: var(--black);
+    padding: 60px 40px 40px;
+    border-top: 1px solid rgba(245,196,0,0.1);
+  }
+
+  .footer-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 40px;
+    flex-wrap: wrap;
+  }
+
+  .footer-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    letter-spacing: 3px;
+    color: var(--yellow);
+    margin-bottom: 12px;
+  }
+
+  .footer-logo span { color: var(--white); }
+
+  .footer-tagline {
+    font-size: 13px;
+    color: var(--gray);
+    max-width: 260px;
+    line-height: 1.6;
+  }
+
+  .footer-links h4 {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--yellow);
+    margin-bottom: 20px;
+  }
+
+  .footer-links ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .footer-links ul a {
+    color: var(--gray);
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.2s;
+  }
+
+  .footer-links ul a:hover { color: var(--white); }
+
+  .footer-bottom {
+    max-width: 1200px;
+    margin: 40px auto 0;
+    padding-top: 24px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    color: rgba(136,136,136,0.5);
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  /* SALE PRICE */
+  .price-old {
+    font-size: 18px;
+    color: var(--gray);
+    text-decoration: line-through;
+    margin-bottom: 4px;
+  }
+  .price-badge {
+    display: inline-block;
+    background: #e53935;
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 3px 10px;
+    margin-bottom: 8px;
+  }
+  .sale-timer {
+    font-size: 12px;
+    color: #e53935;
+    font-weight: 700;
+    margin-top: 6px;
+    letter-spacing: 1px;
+  }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--black); }
+  ::-webkit-scrollbar-thumb { background: var(--yellow); }
+
+  /* DIVIDER */
+  .divider {
+    width: 60px;
+    height: 3px;
+    background: var(--yellow);
+    margin-bottom: 32px;
+  }
+
+  @media (max-width: 768px) {
+    nav { padding: 16px 20px; }
+    nav ul { display: none; }
+    section { padding: 70px 20px; }
+    .hero { padding: 0 20px 70px; }
+    .about { grid-template-columns: 1fr; gap: 40px; }
+    .ebook-inner { grid-template-columns: 1fr; gap: 40px; }
+    .stats-bar { gap: 40px; padding: 24px 20px; }
+    .footer-inner { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">TIR<span>PRO</span></div>
+  <ul>
+    <li><a href="#kursy">Produkty</a></li>
+    <li><a href="#opinie">Opinie</a></li>
+    <li><a href="#kontakt">Kontakt</a></li>
+    <li><a href="#kursy" class="nav-cta">Kup teraz</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="road-bg"></div>
+  <div class="road-lines"></div>
+  <div class="hero-road"></div>
+  <div class="hero-content">
+    <div class="hero-badge">🚛 #1 Platforma dla Kierowców TIR w Polsce</div>
+    <h1>Wsiądź<br>za <span class="accent">kółko.</span><br>Zarabiaj.</h1>
+    <p class="hero-sub">
+      Kompletna wiedza o pracy kierowcy ciężarówki — od prawa jazdy kat. C+E, przez zarobki, po życie w trasie. Wszystko w jednym miejscu.
+    </p>
+    <div class="hero-buttons">
+      <a href="#kursy" class="btn-primary">Zobacz produkty</a>
+      <a href="#kontakt" class="btn-secondary">Napisz do nas</a>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-bar">
+  <div class="stat">
+    <div class="stat-num">2400+</div>
+    <div class="stat-label">Zadowolonych kursantów</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">8 500 zł</div>
+    <div class="stat-label">Średnia pensja kierowcy TIR</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">12</div>
+    <div class="stat-label">Modułów wiedzy</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">4.9★</div>
+    <div class="stat-label">Średnia ocena</div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section>
+  <div class="about">
+    <div>
+      <div class="section-label">O Autorze</div>
+      <div class="section-title">Wiedza z<br>pierwszej ręki</div>
+      <div class="divider"></div>
+      <p class="section-desc">
+        Nie teoria z książek. Prawdziwe doświadczenie z trasy — mechanika, drogi i wszystko co musisz wiedzieć zanim wsiądziesz za kółko.
+      </p>
+      <ul class="check-list">
+        <li>Jak uzyskać prawo jazdy kat. C i C+E krok po kroku</li>
+        <li>Ile naprawdę zarabia kierowca w Polsce i za granicą</li>
+        <li>Jaką firmę wybrać na start — co sprawdzić w umowie</li>
+        <li>Mechanika ciężarówki — co każdy kierowca musi znać</li>
+        <li>Jak przygotować się do pierwszej trasy międzynarodowej</li>
+      </ul>
+    </div>
+    <div class="about-visual">
+      <div class="about-card">
+        <div class="about-icon">🚚</div>
+        <h3>Dla Kogo?</h3>
+        <p>Dla każdego kto chce zostać kierowcą ciężarówki, zmienić pracę, zarabiać więcej i mieć wolność drogi — bez zbędnego ściemy.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COURSES -->
+<section id="kursy" style="background: var(--road); padding-top: 100px; padding-bottom: 100px;">
+  <div style="max-width: 1200px; margin: 0 auto 60px; padding: 0 20px;">
+    <div class="section-label">Produkty</div>
+    <div class="section-title">Wybierz<br>swój pakiet</div>
+    <div class="divider"></div>
+    <p style="color: var(--gray); font-size: 15px; max-width: 500px;">Zacznij od e-booka albo od razu wskocz w kurs — każdy produkt daje Ci natychmiastowy dostęp po zakupie.</p>
+  </div>
+  <div class="courses-grid" style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
+
+    <!-- BESTSELLER PIERWSZY -->
+    <div class="course-card" style="border-top: 3px solid var(--yellow);">
+      <div class="course-tag hot">🔥 Bestseller</div>
+      <h3>Zarobki i praca za granicą — pełny przewodnik</h3>
+      <p>Niemcy, Holandia, Skandynawia — gdzie zarabia się najwięcej, jak znaleźć dobrego pracodawcę i na co uważać w umowie.</p>
+      <div class="price-badge">-33% PROMOCJA</div>
+      <div class="price-old">219 zł</div>
+      <div class="course-price">147 zł<span>dostęp na zawsze · PDF + materiały</span></div>
+      <div class="sale-timer">⏰ Oferta ważna do końca miesiąca</div>
+      <!-- WKLEJ TU LINK Z GUMROAD np. https://tirpro.gumroad.com/l/zarobki-za-granica -->
+      <a class="course-buy" href="https://tirpro.gumroad.com/l/zarobki-za-granica" target="_blank">Kup teraz →</a>
+    </div>
+
+    <!-- STARTER -->
+    <div class="course-card">
+      <div class="course-tag">Starter</div>
+      <h3>Jak zostać kierowcą TIR od zera</h3>
+      <p>Kompletny przewodnik dla osób bez doświadczenia. Od wyboru szkoły jazdy po pierwszą umowę z firmą transportową.</p>
+      <div class="price-badge">-40% PROMOCJA</div>
+      <div class="price-old">79 zł</div>
+      <div class="course-price">47 zł<span>dostęp na zawsze · PDF + materiały</span></div>
+      <div class="sale-timer">⏰ Oferta ważna do końca miesiąca</div>
+      <!-- WKLEJ TU LINK Z GUMROAD np. https://tirpro.gumroad.com/l/starter-tir -->
+      <a class="course-buy" href="https://tirpro.gumroad.com/l/starter-tir" target="_blank">Kup teraz →</a>
+    </div>
+
+    <!-- PRO -->
+    <div class="course-card">
+      <div class="course-tag">Pro</div>
+      <h3>Mechanika Ciężarówki — co każdy kierowca musi wiedzieć</h3>
+      <p>Nie bądź zależny od mechanika. Naucz się diagnozować podstawowe usterki i oszczędzaj czas i pieniądze na trasie.</p>
+      <div class="price-badge">-37% PROMOCJA</div>
+      <div class="price-old">149 zł</div>
+      <div class="course-price">94 zł<span>dostęp na zawsze · PDF + materiały</span></div>
+      <div class="sale-timer">⏰ Oferta ważna do końca miesiąca</div>
+      <!-- WKLEJ TU LINK Z GUMROAD np. https://tirpro.gumroad.com/l/mechanika-ciezarowki -->
+      <a class="course-buy" href="https://tirpro.gumroad.com/l/mechanika-ciezarowki" target="_blank">Kup teraz →</a>
+    </div>
+
+    <!-- EBOOK -->
+    <div class="course-card">
+      <div class="course-tag" style="border-color: rgba(245,196,0,0.6); color: var(--yellow);">📖 E-Book PDF</div>
+      <h3>Kierowca TIR od zera do bohatera</h3>
+      <p>80 stron konkretnej wiedzy — prawo jazdy, zarobki, wybór firmy, mechanika i życie w trasie. Idealny start przed kursem.</p>
+      <div class="price-badge">-40% PROMOCJA</div>
+      <div class="price-old">49 zł</div>
+      <div class="course-price">29 zł<span>natychmiastowy dostęp · PDF</span></div>
+      <div class="sale-timer">⏰ Oferta ważna do końca miesiąca</div>
+      <!-- WKLEJ TU LINK Z GUMROAD np. https://tirpro.gumroad.com/l/ebook-tir -->
+      <a class="course-buy" href="https://tirpro.gumroad.com/l/ebook-tir" target="_blank">Kup teraz →</a>
+    </div>
+
+  </div>
+</section>
+
+<!-- KONTAKT -->
+<section id="kontakt" class="ebook-section">
+  <div style="max-width: 800px; margin: 0 auto; text-align: center;">
+    <div class="section-label">Kontakt</div>
+    <div class="section-title">Masz pytania?<br>Napisz do nas</div>
+    <div class="divider" style="margin: 0 auto 32px;"></div>
+    <p style="color: rgba(242,240,232,0.6); font-size: 17px; line-height: 1.7; margin-bottom: 48px;">
+      Odpowiadamy na każdą wiadomość w ciągu 24 godzin. Pytaj o kursy, produkty, lub o to jak zacząć karierę kierowcy TIR.
+    </p>
+    <div style="display: flex; justify-content: center; gap: 40px; flex-wrap: wrap; margin-bottom: 48px;">
+      <div style="text-align: center;">
+        <div style="font-size: 36px; margin-bottom: 12px;">📧</div>
+        <div style="font-size: 11px; letter-spacing: 3px; color: var(--yellow); font-weight: 700; text-transform: uppercase; margin-bottom: 8px;">E-mail</div>
+        <a href="mailto:kontakt.tirpro@gmail.com" style="color: var(--white); text-decoration: none; font-size: 16px; font-weight: 600;">kontakt.tirpro@gmail.com</a>
+      </div>
+      <div style="text-align: center;">
+        <div style="font-size: 36px; margin-bottom: 12px;">📸</div>
+        <div style="font-size: 11px; letter-spacing: 3px; color: var(--yellow); font-weight: 700; text-transform: uppercase; margin-bottom: 8px;">Instagram</div>
+        <a href="https://www.instagram.com/tirpro.pl" target="_blank" style="color: var(--white); text-decoration: none; font-size: 16px; font-weight: 600;">@tirpro.pl</a>
+      </div>
+      <div style="text-align: center;">
+        <div style="font-size: 36px; margin-bottom: 12px;">🎵</div>
+        <div style="font-size: 11px; letter-spacing: 3px; color: var(--yellow); font-weight: 700; text-transform: uppercase; margin-bottom: 8px;">TikTok</div>
+        <a href="#" style="color: var(--white); text-decoration: none; font-size: 16px; font-weight: 600;">@tirpro.pl</a>
+      </div>
+    </div>
+    <a href="mailto:kontakt.tirpro@gmail.com" class="btn-primary">Napisz do nas →</a>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="opinie">
+  <div style="max-width: 1200px; margin: 0 auto 60px;">
+    <div class="section-label">Opinie</div>
+    <div class="section-title">Co mówią<br>kursanci</div>
+    <div class="divider"></div>
+  </div>
+  <div class="testimonials-grid">
+    <div class="testimonial">
+      <div class="stars">★★★★★</div>
+      <blockquote>"Dzięki temu e-bookowi wiedziałem dokładnie co mnie czeka przed szkołą jazdy. Zdałem za pierwszym razem i dostałem pracę w dwa tygodnie po kursie."</blockquote>
+      <div class="testimonial-author">
+        <div class="author-avatar">M</div>
+        <div>
+          <div class="author-name">Marek W.</div>
+          <div class="author-role">Kierowca TIR, Niemcy</div>
+        </div>
+      </div>
+    </div>
+    <div class="testimonial">
+      <div class="stars">★★★★★</div>
+      <blockquote>"Zaczynałem od zera. Teraz zarabiam ponad 10 000 zł miesięcznie jeżdżąc po Skandynawii. Polecam każdemu kto myśli o zmianie branży."</blockquote>
+      <div class="testimonial-author">
+        <div class="author-avatar">P</div>
+        <div>
+          <div class="author-name">Piotr K.</div>
+          <div class="author-role">Kierowca międzynarodowy</div>
+        </div>
+      </div>
+    </div>
+    <div class="testimonial">
+      <div class="stars">★★★★★</div>
+      <blockquote>"Moduł o mechanice jest nieoceniony. Zaoszczędziłem już kilka razy na serwisie bo wiedziałem co zgłosić i jak opisać problem mechanikowi."</blockquote>
+      <div class="testimonial-author">
+        <div class="author-avatar">T</div>
+        <div>
+          <div class="author-name">Tomasz R.</div>
+          <div class="author-role">Kierowca TIR, 3 lata doświadczenia</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="section-label">Gotowy?</div>
+  <div class="section-title">Zacznij swoją trasę<br>już dziś</div>
+  <p>Dołącz do ponad 2400 osób które zmieniły życie dzięki TIR PRO. Pierwszy krok zajmuje 2 minuty.</p>
+  <a href="#kursy" class="btn-dark">Wybierz kurs →</a>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="footer-logo">TIR<span>PRO</span></div>
+      <p class="footer-tagline">Wiedza z pierwszej ręki dla każdego kto chce zostać kierowcą ciężarówki lub rozwinąć karierę w transporcie.</p>
+    </div>
+    <div class="footer-links">
+      <h4>Produkty</h4>
+      <ul>
+        <li><a href="https://tirpro.gumroad.com/l/zarobki-za-granica" target="_blank">🔥 Kurs Zarobki za granicą</a></li>
+        <li><a href="https://tirpro.gumroad.com/l/starter-tir" target="_blank">Kurs Starter</a></li>
+        <li><a href="https://tirpro.gumroad.com/l/mechanika-ciezarowki" target="_blank">Kurs Mechanika</a></li>
+        <li><a href="https://tirpro.gumroad.com/l/ebook-tir" target="_blank">📖 E-Book PDF — 29 zł</a></li>
+      </ul>
+    </div>
+    <div class="footer-links">
+      <h4>Informacje</h4>
+      <ul>
+        <li><a href="#kontakt">Kontakt</a></li>
+        <li><a href="https://www.instagram.com/tirpro.pl" target="_blank">Instagram</a></li>
+        <li><a href="data:application/pdf;base64,JVBERi0xLjQKJZOMi54gUmVwb3J0TGFiIEdlbmVyYXRlZCBQREYgZG9jdW1lbnQgKG9wZW5zb3VyY2UpCjEgMCBvYmoKPDwKL0YxIDIgMCBSIC9GMiAzIDAgUiAvRjMgNSAwIFIKPj4KZW5kb2JqCjIgMCBvYmoKPDwKL0Jhc2VGb250IC9IZWx2ZXRpY2EgL0VuY29kaW5nIC9XaW5BbnNpRW5jb2RpbmcgL05hbWUgL0YxIC9TdWJ0eXBlIC9UeXBlMSAvVHlwZSAvRm9udAo+PgplbmRvYmoKMyAwIG9iago8PAovQmFzZUZvbnQgL0hlbHZldGljYS1Cb2xkIC9FbmNvZGluZyAvV2luQW5zaUVuY29kaW5nIC9OYW1lIC9GMiAvU3VidHlwZSAvVHlwZTEgL1R5cGUgL0ZvbnQKPj4KZW5kb2JqCjQgMCBvYmoKPDwKL0NvbnRlbnRzIDEwIDAgUiAvTWVkaWFCb3ggWyAwIDAgNTk1LjI3NTYgODQxLjg4OTggXSAvUGFyZW50IDkgMCBSIC9SZXNvdXJjZXMgPDwKL0ZvbnQgMSAwIFIgL1Byb2NTZXQgWyAvUERGIC9UZXh0IC9JbWFnZUIgL0ltYWdlQyAvSW1hZ2VJIF0KPj4gL1JvdGF0ZSAwIC9UcmFucyA8PAoKPj4gCiAgL1R5cGUgL1BhZ2UKPj4KZW5kb2JqCjUgMCBvYmoKPDwKL0Jhc2VGb250IC9aYXBmRGluZ2JhdHMgL05hbWUgL0YzIC9TdWJ0eXBlIC9UeXBlMSAvVHlwZSAvRm9udAo+PgplbmRvYmoKNiAwIG9iago8PAovQ29udGVudHMgMTEgMCBSIC9NZWRpYUJveCBbIDAgMCA1OTUuMjc1NiA4NDEuODg5OCBdIC9QYXJlbnQgOSAwIFIgL1Jlc291cmNlcyA8PAovRm9udCAxIDAgUiAvUHJvY1NldCBbIC9QREYgL1RleHQgL0ltYWdlQiAvSW1hZ2VDIC9JbWFnZUkgXQo+PiAvUm90YXRlIDAgL1RyYW5zIDw8Cgo+PiAKICAvVHlwZSAvUGFnZQo+PgplbmRvYmoKNyAwIG9iago8PAovUGFnZU1vZGUgL1VzZU5vbmUgL1BhZ2VzIDkgMCBSIC9UeXBlIC9DYXRhbG9nCj4+CmVuZG9iago4IDAgb2JqCjw8Ci9BdXRob3IgKFwoYW5vbnltb3VzXCkpIC9DcmVhdGlvbkRhdGUgKEQ6MjAyNjA0MjkxOTM5NTYrMDAnMDAnKSAvQ3JlYXRvciAoXCh1bnNwZWNpZmllZFwpKSAvS2V5d29yZHMgKCkgL01vZERhdGUgKEQ6MjAyNjA0MjkxOTM5NTYrMDAnMDAnKSAvUHJvZHVjZXIgKFJlcG9ydExhYiBQREYgTGlicmFyeSAtIFwob3BlbnNvdXJjZVwpKSAKICAvU3ViamVjdCAoXCh1bnNwZWNpZmllZFwpKSAvVGl0bGUgKFwoYW5vbnltb3VzXCkpIC9UcmFwcGVkIC9GYWxzZQo+PgplbmRvYmoKOSAwIG9iago8PAovQ291bnQgMiAvS2lkcyBbIDQgMCBSIDYgMCBSIF0gL1R5cGUgL1BhZ2VzCj4+CmVuZG9iagoxMCAwIG9iago8PAovRmlsdGVyIFsgL0FTQ0lJODVEZWNvZGUgL0ZsYXRlRGVjb2RlIF0gL0xlbmd0aCAxNTkyCj4+CnN0cmVhbQpHYXRuJj4+czlJJjtCJDsnaldxYS9NYUBFaDBJXlo4MmMjRT8+dChnO1M3c2JfMk5MUzghOyVBclZBWiVmYV5aO1AiU3BkYUI4L1tmNFZaajJrMWpNR2xLaVNMZ0pFbHBOTi47VF9VYGpPKk5Sc1ZUXGVXcENrOGZCK1FkViY7ITZwQj4rV1JIams0JSomcUJmJklYND4mMF1uNS9QaVNmNUhHc1JdWU42UTcpLTBkbSlpcyJRZ19bcV5cW1RdMVlsQUM/ZD9DNnI1NmVHazAiLiRZQSFwKWg+Jl1kVCVQLSM1KipWO21fM0pPa2lxYWhLME0mL01NTFxJS0oqXz5lWyFyMkFDP1c0MENbOHVCcDVeTFAoWSczRT5CcDRPbWRNcyRgPlMqNStYYVAqNnVJOy1SUyc+ckNQW2xXWldzTj1WU2dlcmxGP3QtVkZaO0AkKWk3QSZcLTdpbkJiMmZjXV5SbjNZRTZCJ01qTyNaQj87YmdQUkspQFwwOCJgckw1SiVRQCZoYlEyPkxILm9KU1VUYXBoXGolVGV0bEVKXG5nUCIvTjoza0ZAZGdbPDFRXElBMWM4cjEvaT10QUhQdTJXNlRGa2hOMD8vPEwnUj0+ST87UCFhYCElcWZIW1FPc3NGLmA/LCZcZEZHZmBDbjkmMj1YbkwjXHRJTVZdP11acyRUOSclNFpWKzUkU2xyYjdgIjtcPmg0YSxbKXVCN1tmY1YlZVclZ182NWxJQGAzUE0uRjBVNTMjMmhfM0wiJitVOUpJJUE3a1JRUiNxJiRNQ3U/TFJcczchLVdFcllzOG5EWEI4Ti5NdFZQTG9HaCk5UC9NIUYqPVFxVy1bO3EzSTpGZk5bQSRWRHFVUF87JCZWRD11O0ZpWWZLckozbGRMYUo3Mk4zNzJzQ11lQVpLQ2k5USQiXkQ4T2kiTS84QG1FRFhcdCJnVzNvO0ZsNS5jSE5gV2UrM0giKmJmZ0E/X1FNLmpZXmlFWCdhczRdLU8xQFNOIjg7aTE5NUdhKGAjXlxvSGwhPTgvNWJfRlpWamFkO140NzNSOVNNbTBSOmBFaE9ESClcJVRqcWd1SUBzUmc7bz8ySW9IUlJNJlcvVU1POHBZZVVeRzhdXlgvQ1tQM1EkUk1uXz1HcDVXXVBWayxYIk1DcGdqakNyTkAxdSVBSDFjN2YtZ3RlXiFbNkwsMGFxUF9pNl1XOFhqMnRvLHFJRm5zJlBGVWc8LkVVWTRDR2tNcCpDWlR1SVhhOyxvMTZDJCFgOCIhNGU+b2phTyUscWI0WVlyWUs9Ql5cQGdDPUNJNlRrZS5OQyhZKDFxUUVrWyw1RCooN0QmNitxcl0/Qk5fIzgsWSpGLi5iZ1YqTmRxUUFaZSRZMWtsTExBOGZrZDY4VUAuMyNQKWAvYSJkVUE0J29WYVkpTXQuOk1pOjY6a2xEK2FxQ2dUX0RmJ10xdEtVcy1FZjVdXUQ6Z2kxRXQ1Lih1O3JZKzgkXmg8KDtBUFJOSSslPm8lQnRSWUhVS0s1VFM+a0ZkPT9cJGJMTGZKW24uZUlwO1JCTTxSTjVbPjBRPWtVSU8kN3VpME4rU1NXNm5yNG9WRDRnZTQ8IjZxaCwuJ1tMK0FlaEBCNEhkTCRlYGlXS1k7PU4mbE91WHBIWkpCQzc+K1IpTDkzXltCQVlxViklcDxgTGNBXj5rMi9FaD9kX1M+ST4sY2FJTjdPOjM/UjNjUklsSFlHME5pIi9RSU86LTIrLiUhbiJlPkMzZTtLJ1EkaktTZkRcMyUpYkFpaDA3O0RLP2I5RmdZc2YxdWpAIV86W1QwayIyL21TLV1nb1I5Xzw3XSZdJiJUXnU3U09WZXJZb0YxM1hpbzQrZkIxLGFtMDxmSVo+IzVqczRQT2E8UmREZmcuMEg7YV9cPDdBc2VYN2BkIUhIKmJSM09dcjxrRkhjMyNqTCgvIlNdJDc+cG9hNChOSVRAaWhkWjFuazs4S0ZJZD5wJUQici9xU2tKWWhHMG9FWzBMRm1sRk1NOzNzYUdjZnQ8ZkopKl5kcCElQmRWVCZiYEFFOyopUTFgQj5vaVxgXmZjUXEjOmU8XkhKK1wxRiljMTwnJ2drNTV1UjZ+PmVuZHN0cmVhbQplbmRvYmoKMTEgMCBvYmoKPDwKL0ZpbHRlciBbIC9BU0NJSTg1RGVjb2RlIC9GbGF0ZURlY29kZSBdIC9MZW5ndGggMTQ0Mgo+PgpzdHJlYW0KR2F0VTNnUSgjSCdSXVhWU0ImImgxODpeX1NyMDc6SllpVilYR1snRT8+LDE4Qk8uUyUhXlQuOl4tZyc2RERsOl9uQ2xhLDZxWXQhaUxEcEtTMzRIcHFrJGtWXk1OMC0+PkV0T206WURaJFldRGJyTzFQW1wpR0BYVVArS0ZwRi1TXihBYCQoZ0ckZWA+IUQ+JksvTkY8Zm5kKWVaRD9aTE45bC8iMzI9NW1QN0wpSDspV2k/YylAUylQYWVoQkQpVFJAOyhfWW9xYmguXXAhYWhJQV5QNSIybCFKSTVZV14pZzJyYHA1TEIqaGdFLyNlSisubWtWXCUpRGBHSVNfN19dImdDJmxMRihgSTcrXm5PSHBXbiJDMyw5N0kwbWFSMkg5JVJbRlkvJypFL0VDTW0nLjFRWlVZTjk4NW5ZVD4rYTQzM0MuSFIiMW5FPGZNWV9Lc1JCQS5lTjA4Xjo0TTIsM18hJXVeVUYuaC9LQmg6XDJRW3MhNzw3VGRnRC47bzpWSW9MQDAicElXWmswPlIyW3IqITtYVVFVREEjY2ArcypVVjYzJylgUVtyNWUwOUJjPzNEZWtfNWA4SW8mOm87KC5VcSExdTxGIiMic2I5WkdENl5cLkNuIzVvYSY/YkwnRi9RbE83Y1snRW5ERVotRmtpJC1aKWBlIVYzT1h1WjozVjc8MEVfRmhTWkwrJ25ZVU9uWEspUHFCJl9vSW4tKT1BKVxmMywhcFtaVWg0Y2J1c0BTSnBbPnJoOCxLM0JMRTI3aDEpay9APDAuNCFiKUQ2OyMnWklZVixlMjo5RFYhSF9lMyRYVW5cUVdlKF0uMStYV11SaSNWOGgmYz5rXCRkWnU0QUtjWG1GLC4wQFBkRUZQT2RORGg/P1g+cU1NcSdgSmpkS2k6YyZqSnVAbjtTc0VHZXEhKUkuW2pLSCciSDNUTm0hWERJcEx0VipsbmczaTxvdFZxW1wmTz03cyhHPDlmPUAsNnFxSyZWQGdobktsVD1ZS1U/QlBVLCtRWzYkUUgzLnNGQFFJZHQwbkpYcyhCJ2BxSkckTG1tKkdRJGxCNWBAJD09K2ZMXj4sbzk/blhlKF86bGhvJlBgSF1pUldPLyImUWFwY0wqaVo6TXBDT2lTVi9NQ04sVGcjNSZLNWs8TG1oOiNgRygjUmtKKyw/ST43XUtFVkRyISU4U1pZTkc4QFRJVWM5b1UqODhrVlxWcjF0QUFqZmhXLlBrZkMkLDdXaDNUSTooNFIwKSJaPTJwZWVdYjBxKCJBRWxqLVFKcz5YZzJATyUiTUQpY0g0TjJIXGp1STEkXkBGQFhLXGdeZEYzbjRWIW0/bicxSy5oS1tPZyReX0MnYGhyNU88Y0wyQ1EpXzM5YGtqQ2lsVGpBJHRhSnMrY2ZfRCJMaUJqRD5uYHBPYXBSRFhrRjteWGlIVkVec0pkRVZbQ3BfPmJdJiMiYygtQCtQJURjYlg1Z1pWa3FnLCs9MFdBL0ZHOiRJZDJQSW1xLF5PNWF0VTA9Z20xb1BNUF48bUVOI0ljL1ZSXGRRc0FNR2lVXUkmdFhqU1FDImFlYiVKRFdraF1YLWI7JFdHQWM3XnM8KlpIUUIuPS5OSCFjZUwsJWtVNVddYFY3U0ttVVU1MFRyRlcwU2ZvI0YnPiJDR0lpNlBsalFhQyhGTFkpPDFHdTEuSERiKlhfUSNKb0x0VyQ7M1lFYDwlNFhYbU9wTi4sJGBqRjEtKlNjLSEvLzM8VitSXWw8MV5JV1BgM21dalA8Y1hyVCtHJ1RYZlpRb0pLZlFgJlpRLGNgbWJidDNNRGVhSnRLYzYsWyxZOFo+UF1WRTtPWl5JYEpnPU8zXmVpWiI0b0tpUDglQSxQL2pHQzoqVWJVXDdKXVgiJjhURTk+Z1ZWX1wiVFhefj5lbmRzdHJlYW0KZW5kb2JqCnhyZWYKMCAxMgowMDAwMDAwMDAwIDY1NTM1IGYgCjAwMDAwMDAwNjEgMDAwMDAgbiAKMDAwMDAwMDExMiAwMDAwMCBuIAowMDAwMDAwMjE5IDAwMDAwIG4gCjAwMDAwMDAzMzEgMDAwMDAgbiAKMDAwMDAwMDUzNSAwMDAwMCBuIAowMDAwMDAwNjE4IDAwMDAwIG4gCjAwMDAwMDA4MjIgMDAwMDAgbiAKMDAwMDAwMDg5MCAwMDAwMCBuIAowMDAwMDAxMTcwIDAwMDAwIG4gCjAwMDAwMDEyMzUgMDAwMDAgbiAKMDAwMDAwMjkxOSAwMDAwMCBuIAp0cmFpbGVyCjw8Ci9JRCAKWzxkMTg3MDAzYjM3OThlOWNkZTg2ZjkxZDc3NGI5OWE1ZD48ZDE4NzAwM2IzNzk4ZTljZGU4NmY5MWQ3NzRiOTlhNWQ+XQolIFJlcG9ydExhYiBnZW5lcmF0ZWQgUERGIGRvY3VtZW50IC0tIGRpZ2VzdCAob3BlbnNvdXJjZSkKCi9JbmZvIDggMCBSCi9Sb290IDcgMCBSCi9TaXplIDEyCj4+CnN0YXJ0eHJlZgo0NDUzCiUlRU9GCg==" download="TIR_PRO_Regulamin.pdf">Regulamin</a></li>
+        <li><a href="data:application/pdf;base64,JVBERi0xLjQKJZOMi54gUmVwb3J0TGFiIEdlbmVyYXRlZCBQREYgZG9jdW1lbnQgKG9wZW5zb3VyY2UpCjEgMCBvYmoKPDwKL0YxIDIgMCBSIC9GMiAzIDAgUgo+PgplbmRvYmoKMiAwIG9iago8PAovQmFzZUZvbnQgL0hlbHZldGljYSAvRW5jb2RpbmcgL1dpbkFuc2lFbmNvZGluZyAvTmFtZSAvRjEgL1N1YnR5cGUgL1R5cGUxIC9UeXBlIC9Gb250Cj4+CmVuZG9iagozIDAgb2JqCjw8Ci9CYXNlRm9udCAvSGVsdmV0aWNhLUJvbGQgL0VuY29kaW5nIC9XaW5BbnNpRW5jb2RpbmcgL05hbWUgL0YyIC9TdWJ0eXBlIC9UeXBlMSAvVHlwZSAvRm9udAo+PgplbmRvYmoKNCAwIG9iago8PAovQ29udGVudHMgOSAwIFIgL01lZGlhQm94IFsgMCAwIDU5NS4yNzU2IDg0MS44ODk4IF0gL1BhcmVudCA4IDAgUiAvUmVzb3VyY2VzIDw8Ci9Gb250IDEgMCBSIC9Qcm9jU2V0IFsgL1BERiAvVGV4dCAvSW1hZ2VCIC9JbWFnZUMgL0ltYWdlSSBdCj4+IC9Sb3RhdGUgMCAvVHJhbnMgPDwKCj4+IAogIC9UeXBlIC9QYWdlCj4+CmVuZG9iago1IDAgb2JqCjw8Ci9Db250ZW50cyAxMCAwIFIgL01lZGlhQm94IFsgMCAwIDU5NS4yNzU2IDg0MS44ODk4IF0gL1BhcmVudCA4IDAgUiAvUmVzb3VyY2VzIDw8Ci9Gb250IDEgMCBSIC9Qcm9jU2V0IFsgL1BERiAvVGV4dCAvSW1hZ2VCIC9JbWFnZUMgL0ltYWdlSSBdCj4+IC9Sb3RhdGUgMCAvVHJhbnMgPDwKCj4+IAogIC9UeXBlIC9QYWdlCj4+CmVuZG9iago2IDAgb2JqCjw8Ci9QYWdlTW9kZSAvVXNlTm9uZSAvUGFnZXMgOCAwIFIgL1R5cGUgL0NhdGFsb2cKPj4KZW5kb2JqCjcgMCBvYmoKPDwKL0F1dGhvciAoXChhbm9ueW1vdXNcKSkgL0NyZWF0aW9uRGF0ZSAoRDoyMDI2MDQyOTE5Mzk1NiswMCcwMCcpIC9DcmVhdG9yIChcKHVuc3BlY2lmaWVkXCkpIC9LZXl3b3JkcyAoKSAvTW9kRGF0ZSAoRDoyMDI2MDQyOTE5Mzk1NiswMCcwMCcpIC9Qcm9kdWNlciAoUmVwb3J0TGFiIFBERiBMaWJyYXJ5IC0gXChvcGVuc291cmNlXCkpIAogIC9TdWJqZWN0IChcKHVuc3BlY2lmaWVkXCkpIC9UaXRsZSAoXChhbm9ueW1vdXNcKSkgL1RyYXBwZWQgL0ZhbHNlCj4+CmVuZG9iago4IDAgb2JqCjw8Ci9Db3VudCAyIC9LaWRzIFsgNCAwIFIgNSAwIFIgXSAvVHlwZSAvUGFnZXMKPj4KZW5kb2JqCjkgMCBvYmoKPDwKL0ZpbHRlciBbIC9BU0NJSTg1RGVjb2RlIC9GbGF0ZURlY29kZSBdIC9MZW5ndGggMTUwNQo+PgpzdHJlYW0KR2F0VXM/I3VKcCdTYylULydkYzpmdV42OixRdFszQ3RtNDFDJFZrXFNQRWdGLEQ0UjAlPmErVSkjM2NOIj1AdEBhZD01ayorU040OCsxYEwzSm4xU14+L14rUFFMY25MQS0yLmkpM1xXJFNFWTRlbUlAYUhMXW4wNF5SQFhgOkdEXV8pVUNRcGltYUwtKSdkYEoscDcyaSk+Mi4oOnNgNmJeRmxRJipqcSU5bkUjYVZMYTBkZyJsNUJjMixLSigjNXA/SShyajc+TWFrPkpiQDpRRFJEVF5vY0RdIWciSERGZipfYCZhNSdRMyQrT1Z0aTspUFclUitqQSYuVkEiMHBaJW1CXENwXykrY09QLSFqX1REOkUtIyFkMUdrUmAsamFpIXBdLj5cTlgqSC9TYUM+Wl5cPyNfZ2glLDQiXGlKYl5HcUpoWHRuJC9FO2Q4NywxKzBacDojYlhSME5SVyloal5gMUZMOUFoOXBGZio/Xk9IaDc7UTw+LmlTNlY8KW5BI0ZPJi1qb2VeKE9Sak5STFxpcENmY2A8MkhnOk4vZXM+WlwnXDlXYyFta1dpVSRgZDAuVyMzMS1lMUxbJm5CK0krU01fWWdaM1Yrc1FsO0s8XEdINmkiNDRFKnBOVVdhRzU3QW0uVCg3a0QlOSdDRkZjRXIwNTxpNCVMTmxSXi1KSjsvLk8lXCxxclVYYEVOYyZrOHBWJG8vNmgycCFGV0UxRWROZTYlYi5OZ3FbIyxjOzxaLzp1V0VVRWRYUzVPOElWclZWRU02IWleLXVLUDp1WT9yQFxlTUQ0RWxWKV9UQ291Rm5dPy01MEYla2EjNExiPGlcUWFtOmVpLk05a3JaSC81NSNMPWxiZVsqWm9eU0tsNTxYSFRTbT1YWipwPCZKPz9sVC1WVk4mVHBkSz1JUydbcCEqZzo6M0RhKE5NYCs7b18+T2dqLiE1M081XzpQS0tTVlc9ZUlZbUswQ0huJy9PPUExV1hrXiZbZSMkJyJCLFdsO3M9TSo+VS9OJ1lrN2MxdSdrLUBGZyIsKy5dV0R1KypPOCxrSyRsazgrbj1DdWshNGlqQEw0SFVCRGhWIUdoNzVzbEFWTW1AIUQ0L25jSEVZPj05UnU6TG5TJmlTQW40QDdAR0RaOzJfcVEuSzFfXkwoMlBXO0NHQmxZI3MiUVMxInBvTEE+Nj1zbScyWW8nWUJwWSErZSQhLSZcXypAbjFtOD8+LURFRUlGY1pGJzpnOzRDS2UuN3UiMVsqR1EvOmVfOjUrLmE0YyUtdUQscl5rdEgpb2JJbVc4N1tVWWNrRXEhN21iNTRcWllqZlxZMUxEbTltISsxInVyTjxHY2IxYUNbTFAkSk1rI2Vuak9dRVdSJ2U7KHVXKChyTmVOb3FAJjVOWk1yTkgqUDcqKW8pWSVRLi9wKFhFWj5IMkFcJz5ZRHE1L21IZVwsVjUkVTJtNV4sWWhSbEohJC9GXG5hYFF1JDFNajAnVj8pVipdNSlJZ0AsJVw7KjVvNHRrWUUmTVI6TSI9QydsJ20iOjhmK142WjNsRiE8UlNoayU5VFwuLGUwLkhQN3RjUiJoKVxUck1ROTRARWlqWV9LUnEuLnQoZ0ZrRlQuUVwoNTYkQk5lNmhKYWg3JihqcVtaVjZoSXMrSmxYaTtRV1tNJmRkSG03NTAvMDs/PWpzJUhQcVZxMyFtVS9bLl8pQiwnKT88UUNcW110WU40RiM5cGxWVTBDVUBTXlUhRE5WajYzcVosSC4sKE9aLigpRz5sYEtFZS5DU283RzI4Sk1LPCdlW2hzIW5uREh1ITkmM1ZpbUhPJEk+ImlyQGYlLGYjK25WV2gkSm8sVyZKTDhKIjQzWkYlPGdAVGVUYWQ0X3AlKjRnWSU/Rj1iRTBOcVA7N15eK2dQNFsnNktAIm1GRkcyJXQmXj0iP21va3I2JUFOK14jZmolcThicidmLlBBZzpWNzNKSkZgKSs/Wm5OV2s5ISg2fj5lbmRzdHJlYW0KZW5kb2JqCjEwIDAgb2JqCjw8Ci9GaWx0ZXIgWyAvQVNDSUk4NURlY29kZSAvRmxhdGVEZWNvZGUgXSAvTGVuZ3RoIDEyNzAKPj4Kc3RyZWFtCkdhdFUyZ1FKPGkmOk86U29dJlZbVU9XPUZxaWtuTFA9ZGB1aCZXRWVgQGkuVmZKOGQ/PmAoazVPJiZFOVJJJkc3bG5ISCFKOnIjZHFYZUx0aTZnTXFGJmk9U2dWUzBMcHUkNUc1KFhsXiZAViZka08lRiNOSVU0QiZmKGJ1K2NbYF5uUT0uUmVCMVxKYENVPWQoNV5zKG9rYUBBKVUqW0xUMTVob0NlZ2I6WW5LNGljJlJSIWA4Ri8oNkU6VD4yam90O1k7MCV0aDxjZTFPMEpUJmNNcyNlWUAlV2BrNClpcU9NTGRCM09QNlBWSWIkakM+bCZgKTtPczxlZTM7YjJEKTUzS1leP1dLVm02Jk5mXWVzZD9RMGRCV3U0ND1LPVNPRFI6cytYWC5ZQls0Sl9SVEgxPlVeYi8iSiJIMzE3PzNRYF0xWSZJQjNuPVhdU0NlbW9AP2JsXys7ZTVyWzhyXEJeb15LMjtXYjg6b09WRFNpUVVuZ0ZoaVRBQCNnOnNiMDBxVCVXUGkqcGpvIzReIT0ySmUtMFZuQm5IbjtER1BML0lqMGMsNT5vZkdRbSUpSGQmPjUkOXMnUGdPa0c1WTRFUzdWW0EnbTsjTyJXPldvTy1AMF9BSy4iZlZcImVUUiErIVxdIk5jM09XKGpbYmZmJjZ0KyVBVD5qJihEMCwuXl8vOU5kNzUoXFtDIi4kWmE0ZmYzX049Jj5wcCFjJSp1L1orUy8zOE50cTw6Lyg8JT05VT1Vby1ybXNgcEdgZlRiTTVRcV5dTWU3K2ZDb0UxP1UibVc1PzYkTEZJOnEvWWwqYkhKMi8rSlQnTGJXKjVFR1xQUTVJXjtfZVNdQSM5Jko5TnFtT2cnOTFdSk83Lz10TTg3KSZhLXJXQVc3KkZpQ3JpS0kpKTFZMEZUKVNYSSdcLGVQN2c6MF07J3BqZi0qYFwqQXRRIThJUiVRPFhvXEpjRy9oJUhvQWtrUEEvNUghZENVZUNvMm5wNDxWJSxOR15PRjghSEdRIT02VG5RcG5yI2YrXlN1VmtEJTdhRG1KMnI8WFg1KGguYE9zUF9GbSlZO2tAPkw4aCVPXXBUWDNIUTl1LSpcJ2tGVWFUaDNeUyZtY25Bajtuc3M/JitrNWVMYCFmOjJKVXFVWyEwUiwiXSlVO0g8NVBHNUw3dDE2cyR0YmllOmEuKjpxcU90ImEtPjZuazstYWVwSVY3RWpJZy9LbEg9NS1OM1tdaGYmVFt0NmktL01xLSZdcztGVyxddSRxVGZMJyNSKmw9MFJeVkcnKmMzXWg5Mk9qYUlBKCJOLkBZKUNQQkoyUEIuTG9oSixjNltbcCpHQydCPSJQKjR0a1xuVDlmOjBdYEhDMDMoRjY4PjZHbytwS2NJM2okWDE7KEpKR1QqbkY9TTU3QCc2TWk5RHRROi1BRG8tVEk9XyZXZDw8V0RSJyg7RS5LMTIlVUFTNGYyPWMyRyQnUWtfUGsqPmskSyxwPl9CQT5MLnM7K0deQXJQIjkhU0xSIWRfViYzdUc3cG1XITRNVkZbcVE4LFNsNEduYEhNZ1hfTDleTVEqKypMQGsrI1QvPW1HRlI9IjxCM0VAT3UvbCUnKDQoP2FdJT1KQFMsPydZVEosY3MsclhcQDNxSSdwbDpUJmVCYjAlcmQhP0ZeWWYvT3JyU0FrMjhUfj5lbmRzdHJlYW0KZW5kb2JqCnhyZWYKMCAxMQowMDAwMDAwMDAwIDY1NTM1IGYgCjAwMDAwMDAwNjEgMDAwMDAgbiAKMDAwMDAwMDEwMiAwMDAwMCBuIAowMDAwMDAwMjA5IDAwMDAwIG4gCjAwMDAwMDAzMjEgMDAwMDAgbiAKMDAwMDAwMDUyNCAwMDAwMCBuIAowMDAwMDAwNzI4IDAwMDAwIG4gCjAwMDAwMDA3OTYgMDAwMDAgbiAKMDAwMDAwMTA3NiAwMDAwMCBuIAowMDAwMDAxMTQxIDAwMDAwIG4gCjAwMDAwMDI3MzcgMDAwMDAgbiAKdHJhaWxlcgo8PAovSUQgCls8NzY4Yzg5OTRhMmI4MzRkMjg4NWI4Y2VjN2QyN2I4Y2E+PDc2OGM4OTk0YTJiODM0ZDI4ODViOGNlYzdkMjdiOGNhPl0KJSBSZXBvcnRMYWIgZ2VuZXJhdGVkIFBERiBkb2N1bWVudCAtLSBkaWdlc3QgKG9wZW5zb3VyY2UpCgovSW5mbyA3IDAgUgovUm9vdCA2IDAgUgovU2l6ZSAxMQo+PgpzdGFydHhyZWYKNDA5OQolJUVPRgo=" download="TIR_PRO_Polityka_Prywatnosci.pdf">Polityka prywatności</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 TIR PRO. Wszelkie prawa zastrzeżone.</span>
+    <span>Zbudowano z 🚛 i pasji do drogi</span>
+  </div>
+</footer>
+
+</body>
+</html>
